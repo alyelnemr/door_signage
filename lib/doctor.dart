@@ -11,49 +11,69 @@ String doctorToJson(Doctor data) => json.encode(data.toJson());
 class Doctor {
   Doctor({
     required this.id,
-    required this.doctorName,
+    required this.doctorNameAR,
+    required this.doctorNameEN,
     required this.clinicId,
+    required this.clinicNameAR,
+    required this.clinicNameEN,
+    required this.specialtyAR,
+    required this.specialtyEN,
     required this.clinicStartDate,
     required this.clinicEndDate,
     required this.imagePath,
-    this.imageBinary,
   });
 
   int id;
-  final String doctorName;
+  final String doctorNameAR;
+  final String doctorNameEN;
   int clinicId;
+  String clinicNameAR;
+  String clinicNameEN;
+  String specialtyAR;
+  String specialtyEN;
   String clinicStartDate;
   String clinicEndDate;
   String imagePath;
-  dynamic imageBinary;
 
   static Doctor fromJson(json) => Doctor(
     id: json["ID"],
-    doctorName: json["DoctorName"],
+    doctorNameAR: json["DoctorNameAR"],
+    doctorNameEN: json["DoctorNameEN"],
     clinicId: json["ClinicID"],
+    clinicNameAR: json["ClinicNameAR"],
+    clinicNameEN: json["ClinicNameEN"],
+    specialtyAR: json["SpecialtyAR"],
+    specialtyEN: json["SpecialtyEN"],
     clinicStartDate: json["ClinicStartDate"],
     clinicEndDate: json["ClinicEndDate"],
     imagePath: json["ImagePath"],
-    imageBinary: json["ImageBinary"],
   );
 
   factory Doctor.fromJson_(Map<String, dynamic> json) => Doctor(
     id: json["ID"],
-    doctorName: json["DoctorName"],
+    doctorNameAR: json["DoctorNameAR"],
+    doctorNameEN: json["DoctorNameEN"],
     clinicId: json["ClinicID"],
+    clinicNameAR: json["ClinicNameAR"],
+    clinicNameEN: json["ClinicNameEN"],
+    specialtyAR: json["SpecialtyAR"],
+    specialtyEN: json["SpecialtyEN"],
     clinicStartDate: json["ClinicStartDate"],
     clinicEndDate: json["ClinicEndDate"],
     imagePath: json["ImagePath"],
-    imageBinary: json["ImageBinary"],
   );
 
   Map<String, dynamic> toJson() => {
     "ID": id,
-    "DoctorName": doctorName,
+    "DoctorNameAR": doctorNameAR,
+    "DoctorNameEN": doctorNameEN,
     "ClinicID": clinicId,
+    "ClinicNameAR": clinicNameAR,
+    "ClinicNameEN": clinicNameEN,
+    "SpecialtyAR": specialtyAR,
+    "SpecialtyEN": specialtyEN,
     "ClinicStartDate": clinicStartDate,
     "ClinicEndDate": clinicEndDate,
     "ImagePath": imagePath,
-    "ImageBinary": imageBinary,
   };
 }

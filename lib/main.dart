@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 240),
+                    padding: const EdgeInsets.only(top: 220),
                     child: Text(doctorNameEN, style: const TextStyle(fontSize: 70)),
                   ),
                 ),
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 60),
+                      padding: const EdgeInsets.only(top: 40),
                       child: Text(specialtyEN, style: const TextStyle(fontSize: 50)),
                     ),
                   ),

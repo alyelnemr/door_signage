@@ -37,41 +37,47 @@ class _HomePageState extends State<HomePage> {
   var secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
   var mainURL = "";
   DateTime? firstPressedTime;
-  int durationSeconds = 20;
+  int durationSeconds = 60;
   bool isTimeDisplay = true;
   bool isImageDisplay = true;
 
 
   @override
-  Future<void> initState() {
+  void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-    Timer.periodic(const Duration(seconds: 20), (timer) {
-      setState(() {
-        secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
-        durationSeconds = getDurationFromAPI();
-        print('doctorsList: ' + doctorsList.toString());
+    setState(() {
+      secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
+      getDurationFromAPI().then((value) {
+        durationSeconds = value;
+        Timer.periodic(Duration(seconds: value), (timer) {
+          setState(() {
+            secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
+            doctorsList = getDataFromAPI();
+            print('doctorsList: $doctorsList');
+          });
+        });
       });
     });
   }
 
-   Future<Doctor> getDurationFromAPI() async {
-     String url1 = "http://10.102.111.88:1020/api/getDuration/";
-     final response1 = await http.get(Uri.parse(url1));
+   Future<int> getDurationFromAPI() async {
+    int duration = 60;
+     String url = "http://10.102.111.88:1020/api/getDuration/";
+     final response1 = await http.get(Uri.parse(url));
      if (response1.statusCode == 200) {
-       durationSeconds = response1.body as int;
-       if (durationSeconds <= 0) durationSeconds = 20;
-       Timer.periodic(Duration(seconds: durationSeconds), (timer) {
-         setState(() {
-           secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
-           doctorsList = getDataFromAPI();
-           print('doctorsList: ' + doctorsList.toString());
-         });
-       });
+       duration = int.parse(response1.body);
+       if (duration <= 0) {
+         duration = 60;
+       }
      } else {
-       throw Exception("Error in calling api");
+       duration = 60;
      }
+
+    var completer = Completer<int>();
+    completer.complete(duration);
+    return completer.future;
   }
 
    Future<Doctor> getDataFromAPI() async {
@@ -108,6 +114,7 @@ class _HomePageState extends State<HomePage> {
             String specialtyEN = snapshot.data!.specialtyEN;
             isImageDisplay = snapshot.data!.refreshImage;
             isTimeDisplay = snapshot.data!.displayTime;
+            mainURL = snapshot.data!.imagePath;
             if (isImageDisplay) {
               mainURL = "${snapshot.data!.imagePath}?dum=$secondDateTime";
             }
@@ -126,7 +133,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 220),
+                    padding: const EdgeInsets.only(top: 170),
                     child: Text(doctorNameEN, style: const TextStyle(fontSize: 70)),
                   ),
                 ),

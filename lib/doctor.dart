@@ -14,7 +14,7 @@ class Doctor {
     required this.id,
     required this.doctorNameAR,
     required this.doctorNameEN,
-    required this.clinicId,
+    required this.roomID,
     required this.clinicNameAR,
     required this.clinicNameEN,
     required this.specialtyAR,
@@ -26,10 +26,10 @@ class Doctor {
     required this.displayTime,
   });
 
-  int id;
+  String id;
   final String doctorNameAR;
   final String doctorNameEN;
-  int clinicId;
+  int roomID;
   String clinicNameAR;
   String clinicNameEN;
   String specialtyAR;
@@ -44,7 +44,7 @@ class Doctor {
     id: json["ID"],
     doctorNameAR: json["DoctorNameAR"],
     doctorNameEN: json["DoctorNameEN"],
-    clinicId: json["ClinicID"],
+    roomID: json["RoomID"],
     clinicNameAR: json["ClinicNameAR"],
     clinicNameEN: json["ClinicNameEN"],
     specialtyAR: json["SpecialtyAR"],
@@ -60,7 +60,7 @@ class Doctor {
     id: json["ID"],
     doctorNameAR: json["DoctorNameAR"],
     doctorNameEN: json["DoctorNameEN"],
-    clinicId: json["ClinicID"],
+    roomID: json["RoomID"],
     clinicNameAR: json["ClinicNameAR"],
     clinicNameEN: json["ClinicNameEN"],
     specialtyAR: json["SpecialtyAR"],
@@ -76,7 +76,7 @@ class Doctor {
     "ID": id,
     "DoctorNameAR": doctorNameAR,
     "DoctorNameEN": doctorNameEN,
-    "ClinicID": clinicId,
+    "RoomID": roomID,
     "ClinicNameAR": clinicNameAR,
     "ClinicNameEN": clinicNameEN,
     "SpecialtyAR": specialtyAR,

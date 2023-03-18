@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -8,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:core';
 
+import 'config.dart';
 import 'doctor.dart';
 
 void main() {
@@ -40,7 +40,19 @@ class _HomePageState extends State<HomePage> {
   int durationSeconds = 60;
   bool isTimeDisplay = true;
   bool isImageDisplay = true;
-
+  Config config= Config(
+      duration: "120",
+      doctorNameENTop: "170",
+      doctorNameENFontSize: "70",
+      doctorNameARTop: "10",
+      doctorNameARFontSize: "70",
+      specialtyENTop: "50",
+      specialtyENFontSize: "70",
+      specialtyARTop: "10",
+      specialtyARFontSize: "70",
+      clinicDateTop: "60",
+      clinicDateFontSize: "70"
+  );
 
   @override
   void initState() {
@@ -49,9 +61,9 @@ class _HomePageState extends State<HomePage> {
     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     setState(() {
       secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
-      getDurationFromAPI().then((value) {
-        durationSeconds = value;
-        Timer.periodic(Duration(seconds: value), (timer) {
+      getConfigurationFromAPI().then((value) {
+        config = value;
+        Timer.periodic(Duration(seconds: int.parse(config.duration)), (timer) {
           setState(() {
             secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
             doctorsList = getDataFromAPI();
@@ -62,21 +74,15 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-   Future<int> getDurationFromAPI() async {
-    int duration = 60;
-     String url = "http://10.102.111.88:1020/api/getDuration/";
+  Future<Config>  getConfigurationFromAPI() async {
+    String url = "http://10.102.111.88:1020/api/getConfiguration/";
      final response1 = await http.get(Uri.parse(url));
      if (response1.statusCode == 200) {
-       duration = int.parse(response1.body);
-       if (duration <= 0) {
-         duration = 60;
-       }
-     } else {
-       duration = 60;
+       config = Config.fromJson(jsonDecode(response1.body));
      }
 
-    var completer = Completer<int>();
-    completer.complete(duration);
+    var completer = Completer<Config>();
+    completer.complete(config);
     return completer.future;
   }
 
@@ -84,7 +90,6 @@ class _HomePageState extends State<HomePage> {
     String url = "http://10.102.111.88:1020/api/getClinicByIPAddress/device";
     final response2 = await http.get(Uri.parse(url));
     if (response2.statusCode == 200) {
-      print('response2.body: ' + response2.body);
       return Doctor.fromJson_(jsonDecode(response2.body));
     } else {
       throw Exception("Error in calling api");
@@ -133,32 +138,57 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 170),
-                    child: Text(doctorNameEN, style: const TextStyle(fontSize: 70)),
+                    padding: EdgeInsets.only(top: double.parse(config.doctorNameENTop)),
+                    child: Text(doctorNameEN,
+                        style: TextStyle(
+                            fontSize: double.parse(config.doctorNameENFontSize),
+                            fontFamily: "Avenir Black"
+                        )
+                    ),
                   ),
                 ),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Text(doctorNameAR, style: const TextStyle(fontSize: 70)),
+                      padding: EdgeInsets.only(top: double.parse(config.doctorNameARTop)),
+                      child: Text(doctorNameAR,
+                          style: TextStyle(
+                              fontSize: double.parse(config.doctorNameARFontSize),
+                              fontFamily: "Avenir Black"
+                          )
+                      ),
                     ),
                   ),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 50),
-                      child: Text(specialtyEN, style: const TextStyle(fontSize: 50)),
+                      padding: EdgeInsets.only(top: double.parse(config.specialtyENTop)),
+                      child: Text(specialtyEN,
+                          style: TextStyle(
+                              fontSize: double.parse(config.specialtyENFontSize),
+                              fontFamily: "Avenir Black"
+                          )
+                      ),
                     ),
                   ),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Text(specialtyAR, style: const TextStyle(fontSize: 50)),
+                      padding: EdgeInsets.only(top: double.parse(config.specialtyARTop)),
+                      child: Text(specialtyAR,
+                          style: TextStyle(
+                              fontSize: double.parse(config.specialtyARFontSize),
+                              fontFamily: "Avenir Black"
+                          )
+                      ),
                     ),
                   ),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 60),
-                      child: Text('${formatClinicDate(startDate)} - ${formatClinicDate(endDate)}', style: const TextStyle(fontSize: 40)),
+                      padding: EdgeInsets.only(top: double.parse(config.clinicDateTop)),
+                      child: Text('${formatClinicDate(startDate)} - ${formatClinicDate(endDate)}',
+                          style: TextStyle(
+                              fontSize: double.parse(config.clinicDateFontSize),
+                              fontFamily: "Avenir Black"
+                          )
+                      ),
                     ),
                   ),
                 ],

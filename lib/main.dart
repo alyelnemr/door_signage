@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -36,37 +37,59 @@ class _HomePageState extends State<HomePage> {
   var secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
   var mainURL = "";
   DateTime? firstPressedTime;
+  int durationSeconds = 20;
+  bool isTimeDisplay = true;
+  bool isImageDisplay = true;
 
 
   @override
-  void initState(){
+  Future<void> initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     Timer.periodic(const Duration(seconds: 20), (timer) {
       setState(() {
         secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
-        doctorsList = getDataFromAPI();
+        durationSeconds = getDurationFromAPI();
         print('doctorsList: ' + doctorsList.toString());
       });
     });
   }
 
+   Future<Doctor> getDurationFromAPI() async {
+     String url1 = "http://10.102.111.88:1020/api/getDuration/";
+     final response1 = await http.get(Uri.parse(url1));
+     if (response1.statusCode == 200) {
+       durationSeconds = response1.body as int;
+       if (durationSeconds <= 0) durationSeconds = 20;
+       Timer.periodic(Duration(seconds: durationSeconds), (timer) {
+         setState(() {
+           secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
+           doctorsList = getDataFromAPI();
+           print('doctorsList: ' + doctorsList.toString());
+         });
+       });
+     } else {
+       throw Exception("Error in calling api");
+     }
+  }
+
    Future<Doctor> getDataFromAPI() async {
-    String clinicIPAddress = "device";
-    String url = "http://10.102.111.30:1020/api/getClinicByIPAddress/device";
-    final response = await http.get(Uri.parse(url));
-    print('url $url');
-    if (response.statusCode == 200) {
-      print('response.body ${response.body}');
-      return Doctor.fromJson_(jsonDecode(response.body));
+    String url = "http://10.102.111.88:1020/api/getClinicByIPAddress/device";
+    final response2 = await http.get(Uri.parse(url));
+    if (response2.statusCode == 200) {
+      print('response2.body: ' + response2.body);
+      return Doctor.fromJson_(jsonDecode(response2.body));
     } else {
       throw Exception("Error in calling api");
     }
   }
 
   String formatClinicDate(DateTime currentDate){
-    return DateFormat('hh:mm a').format(currentDate);
+    if (isTimeDisplay) {
+      return DateFormat('hh:mm a').format(currentDate);
+    }
+    return "";
   }
 
   @override
@@ -77,13 +100,17 @@ class _HomePageState extends State<HomePage> {
         future: doctorsList,
         builder: (context, snapshot){
           if(snapshot.hasData) {
-            mainURL = "${snapshot.data!.imagePath}?dum=$secondDateTime";
             String doctorNameEN = snapshot.data!.doctorNameEN;
             String doctorNameAR = snapshot.data!.doctorNameAR;
             String clinicNameAR = snapshot.data!.clinicNameAR;
             String clinicNameEN = snapshot.data!.clinicNameEN;
             String specialtyAR = snapshot.data!.specialtyAR;
             String specialtyEN = snapshot.data!.specialtyEN;
+            isImageDisplay = snapshot.data!.refreshImage;
+            isTimeDisplay = snapshot.data!.displayTime;
+            if (isImageDisplay) {
+              mainURL = "${snapshot.data!.imagePath}?dum=$secondDateTime";
+            }
             DateTime startDate = DateTime.parse(snapshot.data!.clinicStartDate);
             DateTime endDate = DateTime.parse(snapshot.data!.clinicEndDate);
             return Container(
@@ -111,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 40),
+                      padding: const EdgeInsets.only(top: 50),
                       child: Text(specialtyEN, style: const TextStyle(fontSize: 50)),
                     ),
                   ),
@@ -123,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 50),
+                      padding: const EdgeInsets.only(top: 60),
                       child: Text('${formatClinicDate(startDate)} - ${formatClinicDate(endDate)}', style: const TextStyle(fontSize: 40)),
                     ),
                   ),

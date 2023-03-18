@@ -3,6 +3,7 @@
 //     final doctor = doctorFromJson(jsonString);
 
 import 'dart:convert';
+import 'dart:ffi';
 
 Doctor doctorFromJson(String str) => Doctor.fromJson(json.decode(str));
 
@@ -21,6 +22,8 @@ class Doctor {
     required this.clinicStartDate,
     required this.clinicEndDate,
     required this.imagePath,
+    required this.refreshImage,
+    required this.displayTime,
   });
 
   int id;
@@ -34,6 +37,8 @@ class Doctor {
   String clinicStartDate;
   String clinicEndDate;
   String imagePath;
+  bool refreshImage;
+  bool displayTime;
 
   static Doctor fromJson(json) => Doctor(
     id: json["ID"],
@@ -47,6 +52,8 @@ class Doctor {
     clinicStartDate: json["ClinicStartDate"],
     clinicEndDate: json["ClinicEndDate"],
     imagePath: json["ImagePath"],
+    refreshImage: json["RefreshImage"],
+    displayTime: json["DisplayTime"],
   );
 
   factory Doctor.fromJson_(Map<String, dynamic> json) => Doctor(
@@ -61,6 +68,8 @@ class Doctor {
     clinicStartDate: json["ClinicStartDate"],
     clinicEndDate: json["ClinicEndDate"],
     imagePath: json["ImagePath"],
+    refreshImage: json["RefreshImage"],
+    displayTime: json["DisplayTime"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -75,5 +84,7 @@ class Doctor {
     "ClinicStartDate": clinicStartDate,
     "ClinicEndDate": clinicEndDate,
     "ImagePath": imagePath,
+    "RefreshImage": refreshImage,
+    "DisplayTime": displayTime,
   };
 }

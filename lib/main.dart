@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<Config>  getConfigurationFromAPI() async {
-    String url = "http://10.102.111.88:1020/api/getConfiguration/";
+    String url = "http://ahj-queueserver/api/getConfiguration/";
      final response1 = await http.get(Uri.parse(url));
      if (response1.statusCode == 200) {
        config = Config.fromJson(jsonDecode(response1.body));
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
   }
 
    Future<Doctor> getDataFromAPI() async {
-    String url = "http://10.102.111.88:1020/api/getClinicByIPAddress/device";
+    String url = "http://ahj-queueserver/api/getClinicByIPAddress/device";
     final response2 = await http.get(Uri.parse(url));
     if (response2.statusCode == 200) {
       return Doctor.fromJson_(jsonDecode(response2.body));
@@ -111,12 +111,12 @@ class _HomePageState extends State<HomePage> {
         future: doctorsList,
         builder: (context, snapshot){
           if(snapshot.hasData) {
-            String doctorNameEN = snapshot.data!.doctorNameEN;
-            String doctorNameAR = snapshot.data!.doctorNameAR;
-            String clinicNameAR = snapshot.data!.clinicNameAR;
-            String clinicNameEN = snapshot.data!.clinicNameEN;
-            String specialtyAR = snapshot.data!.specialtyAR;
-            String specialtyEN = snapshot.data!.specialtyEN;
+            String doctorNameEN = snapshot.data!.isActive ? snapshot.data!.doctorNameEN : "";
+            String doctorNameAR = snapshot.data!.isActive ? snapshot.data!.doctorNameAR : "";
+            String clinicNameAR = snapshot.data!.isActive ? snapshot.data!.clinicNameAR : "";
+            String clinicNameEN = snapshot.data!.isActive ? snapshot.data!.clinicNameEN : "";
+            String specialtyAR = snapshot.data!.isActive ? snapshot.data!.specialtyAR : "";
+            String specialtyEN = snapshot.data!.isActive ? snapshot.data!.specialtyEN : "";
             isImageDisplay = snapshot.data!.refreshImage;
             isTimeDisplay = snapshot.data!.displayTime;
             mainURL = snapshot.data!.imagePath;
@@ -125,6 +125,7 @@ class _HomePageState extends State<HomePage> {
             }
             DateTime startDate = DateTime.parse(snapshot.data!.clinicStartDate);
             DateTime endDate = DateTime.parse(snapshot.data!.clinicEndDate);
+            String stringClinicDateTime = snapshot.data!.isActive ? '${formatClinicDate(startDate)} - ${formatClinicDate(endDate)}' : "";
             return Container(
               width: double.infinity,
               height: double.infinity,
@@ -183,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                   Center(
                     child: Padding(
                       padding: EdgeInsets.only(top: double.parse(config.clinicDateTop)),
-                      child: Text('${formatClinicDate(startDate)} - ${formatClinicDate(endDate)}',
+                      child: Text(stringClinicDateTime,
                           style: TextStyle(
                               fontSize: double.parse(config.clinicDateFontSize),
                               fontFamily: "Avenir Black"
@@ -195,11 +196,16 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           } else if (snapshot.hasError) {
-             print(snapshot.stackTrace);
             return ListView(
               children: [
                 Text('url: $mainURL'),
                 Text('Error: ${snapshot.error}')
+              ],
+            );
+          } else {
+            return ListView(
+              children: const [
+                Text('No Data to be displayed...'),
               ],
             );
           }

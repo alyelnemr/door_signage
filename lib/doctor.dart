@@ -24,6 +24,7 @@ class Doctor {
     required this.imagePath,
     required this.refreshImage,
     required this.displayTime,
+    required this.isActive,
   });
 
   String id;
@@ -39,6 +40,7 @@ class Doctor {
   String imagePath;
   bool refreshImage;
   bool displayTime;
+  bool isActive;
 
   static Doctor fromJson(json) => Doctor(
     id: json["ID"],
@@ -54,6 +56,7 @@ class Doctor {
     imagePath: json["ImagePath"],
     refreshImage: json["RefreshImage"],
     displayTime: json["DisplayTime"],
+    isActive: json["IsActive"],
   );
 
   factory Doctor.fromJson_(Map<String, dynamic> json) => Doctor(
@@ -70,6 +73,7 @@ class Doctor {
     imagePath: json["ImagePath"],
     refreshImage: json["RefreshImage"],
     displayTime: json["DisplayTime"],
+    isActive: json["IsActive"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -86,5 +90,6 @@ class Doctor {
     "ImagePath": imagePath,
     "RefreshImage": refreshImage,
     "DisplayTime": displayTime,
+    "IsActive": isActive,
   };
 }

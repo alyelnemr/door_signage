@@ -75,7 +75,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<Config>  getConfigurationFromAPI() async {
-    String url = "http://ahj-queue-01/api/getConfiguration/";
+    String url = "http://ahj-queue.andaluisagroup.net:1020/api/getConfiguration/";
+    // String url = "http://ahj-queue-01/api/getConfiguration/";
      final response1 = await http.get(Uri.parse(url));
      if (response1.statusCode == 200) {
        config = Config.fromJson(jsonDecode(response1.body));
@@ -87,7 +88,7 @@ class _HomePageState extends State<HomePage> {
   }
 
    Future<Doctor> getDataFromAPI() async {
-    String url = "http://ahj-queue-01/api/getClinicByIPAddress/device";
+    String url = "http://ahj-queue.andaluisagroup.net:1020/api/getClinicByIPAddress/device";
     final response2 = await http.get(Uri.parse(url));
     if (response2.statusCode == 200) {
       return Doctor.fromJson_(jsonDecode(response2.body));

@@ -3,7 +3,6 @@
 //     final doctor = doctorFromJson(jsonString);
 
 import 'dart:convert';
-import 'dart:ffi';
 
 Doctor doctorFromJson(String str) => Doctor.fromJson(json.decode(str));
 
@@ -42,24 +41,7 @@ class Doctor {
   bool displayTime;
   bool isActive;
 
-  static Doctor fromJson(json) => Doctor(
-    id: json["ID"],
-    doctorNameAR: json["DoctorNameAR"],
-    doctorNameEN: json["DoctorNameEN"],
-    roomID: json["RoomID"],
-    clinicNameAR: json["ClinicNameAR"],
-    clinicNameEN: json["ClinicNameEN"],
-    specialtyAR: json["SpecialtyAR"],
-    specialtyEN: json["SpecialtyEN"],
-    clinicStartDate: json["ClinicStartDate"],
-    clinicEndDate: json["ClinicEndDate"],
-    imagePath: json["ImagePath"],
-    refreshImage: json["RefreshImage"],
-    displayTime: json["DisplayTime"],
-    isActive: json["IsActive"],
-  );
-
-  factory Doctor.fromJson_(Map<String, dynamic> json) => Doctor(
+  factory Doctor.fromJson(Map<String, dynamic> json) => Doctor(
     id: json["ID"],
     doctorNameAR: json["DoctorNameAR"],
     doctorNameEN: json["DoctorNameEN"],

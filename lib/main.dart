@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -40,7 +41,7 @@ class _HomePageState extends State<HomePage> {
   int durationSeconds = 60;
   bool isTimeDisplay = true;
   bool isImageDisplay = true;
-  Config config= Config(
+  Config config = Config(
       duration: "120",
       doctorNameENTop: "170",
       doctorNameENFontSize: "70",
@@ -51,14 +52,14 @@ class _HomePageState extends State<HomePage> {
       specialtyARTop: "10",
       specialtyARFontSize: "70",
       clinicDateTop: "60",
-      clinicDateFontSize: "70"
-  );
+      clinicDateFontSize: "70");
 
   @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     setState(() {
       secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
       getConfigurationFromAPI().then((value) {
@@ -74,30 +75,32 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<Config>  getConfigurationFromAPI() async {
-    String url = "http://ahj-queue.andalusiagroup.net:1020/api/getConfiguration/";
+  Future<Config> getConfigurationFromAPI() async {
+    String url =
+        "http://ahj-queue.andalusiagroup.net:1020/api/getConfiguration/";
     // String url = "http://ahj-queue-01/api/getConfiguration/";
-     final response1 = await http.get(Uri.parse(url));
-     if (response1.statusCode == 200) {
-       config = Config.fromJson(jsonDecode(response1.body));
-     }
+    final response1 = await http.get(Uri.parse(url));
+    if (response1.statusCode == 200) {
+      config = Config.fromJson(jsonDecode(response1.body));
+    }
 
     var completer = Completer<Config>();
     completer.complete(config);
     return completer.future;
   }
 
-   Future<Doctor> getDataFromAPI() async {
-    String url = "http://ahj-queue.andalusiagroup.net:1020/api/getClinicByIPAddress/device";
+  Future<Doctor> getDataFromAPI() async {
+    String url =
+        "http://ahj-queue.andalusiagroup.net:1020/api/getClinicByIPAddress/device";
     final response2 = await http.get(Uri.parse(url));
     if (response2.statusCode == 200) {
-      return Doctor.fromJson_(jsonDecode(response2.body));
+      return Doctor.fromJson(jsonDecode(response2.body));
     } else {
       throw Exception("Error in calling api");
     }
   }
 
-  String formatClinicDate(DateTime currentDate){
+  String formatClinicDate(DateTime currentDate) {
     if (isTimeDisplay) {
       return DateFormat('hh:mm a').format(currentDate);
     }
@@ -110,14 +113,18 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.transparent,
       body: FutureBuilder<Doctor>(
         future: doctorsList,
-        builder: (context, snapshot){
-          if(snapshot.hasData) {
-            String doctorNameEN = snapshot.data!.isActive ? snapshot.data!.doctorNameEN : "";
-            String doctorNameAR = snapshot.data!.isActive ? snapshot.data!.doctorNameAR : "";
-            String clinicNameAR = snapshot.data!.isActive ? snapshot.data!.clinicNameAR : "";
-            String clinicNameEN = snapshot.data!.isActive ? snapshot.data!.clinicNameEN : "";
-            String specialtyAR = snapshot.data!.isActive ? snapshot.data!.specialtyAR : "";
-            String specialtyEN = snapshot.data!.isActive ? snapshot.data!.specialtyEN : "";
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            String doctorNameEN =
+                snapshot.data!.isActive ? snapshot.data!.doctorNameEN : "";
+            String doctorNameAR =
+                snapshot.data!.isActive ? snapshot.data!.doctorNameAR : "";
+            // String clinicNameAR = snapshot.data!.isActive ? snapshot.data!.clinicNameAR : "";
+            // String clinicNameEN = snapshot.data!.isActive ? snapshot.data!.clinicNameEN : "";
+            String specialtyAR =
+                snapshot.data!.isActive ? snapshot.data!.specialtyAR : "";
+            String specialtyEN =
+                snapshot.data!.isActive ? snapshot.data!.specialtyEN : "";
             isImageDisplay = snapshot.data!.refreshImage;
             isTimeDisplay = snapshot.data!.displayTime;
             mainURL = snapshot.data!.imagePath;
@@ -126,71 +133,70 @@ class _HomePageState extends State<HomePage> {
             }
             DateTime startDate = DateTime.parse(snapshot.data!.clinicStartDate);
             DateTime endDate = DateTime.parse(snapshot.data!.clinicEndDate);
-            String stringClinicDateTime = snapshot.data!.isActive ? '${formatClinicDate(startDate)} - ${formatClinicDate(endDate)}' : "";
+            String stringClinicDateTime = snapshot.data!.isActive
+                ? '${formatClinicDate(startDate)} - ${formatClinicDate(endDate)}'
+                : "";
             return Container(
               width: double.infinity,
               height: double.infinity,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: NetworkImage(mainURL),
-                    fit: BoxFit.cover
-                ),
+                    image: NetworkImage(mainURL), fit: BoxFit.cover),
               ),
               child: ListView(
                 children: [
                   Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: double.parse(config.doctorNameENTop)),
-                    child: Text(doctorNameEN,
-                        style: TextStyle(
-                            fontSize: double.parse(config.doctorNameENFontSize),
-                            fontFamily: "Avenir Black"
-                        )
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: double.parse(config.doctorNameENTop)),
+                      child: Text(doctorNameEN,
+                          style: TextStyle(
+                              fontSize:
+                                  double.parse(config.doctorNameENFontSize),
+                              fontFamily: "Avenir Black")),
                     ),
                   ),
-                ),
                   Center(
                     child: Padding(
-                      padding: EdgeInsets.only(top: double.parse(config.doctorNameARTop)),
+                      padding: EdgeInsets.only(
+                          top: double.parse(config.doctorNameARTop)),
                       child: Text(doctorNameAR,
                           style: TextStyle(
-                              fontSize: double.parse(config.doctorNameARFontSize),
-                              fontFamily: "Avenir Black"
-                          )
-                      ),
+                              fontSize:
+                                  double.parse(config.doctorNameARFontSize),
+                              fontFamily: "Avenir Black")),
                     ),
                   ),
                   Center(
                     child: Padding(
-                      padding: EdgeInsets.only(top: double.parse(config.specialtyENTop)),
+                      padding: EdgeInsets.only(
+                          top: double.parse(config.specialtyENTop)),
                       child: Text(specialtyEN,
                           style: TextStyle(
-                              fontSize: double.parse(config.specialtyENFontSize),
-                              fontFamily: "Avenir Black"
-                          )
-                      ),
+                              fontSize:
+                                  double.parse(config.specialtyENFontSize),
+                              fontFamily: "Avenir Black")),
                     ),
                   ),
                   Center(
                     child: Padding(
-                      padding: EdgeInsets.only(top: double.parse(config.specialtyARTop)),
+                      padding: EdgeInsets.only(
+                          top: double.parse(config.specialtyARTop)),
                       child: Text(specialtyAR,
                           style: TextStyle(
-                              fontSize: double.parse(config.specialtyARFontSize),
-                              fontFamily: "Avenir Black"
-                          )
-                      ),
+                              fontSize:
+                                  double.parse(config.specialtyARFontSize),
+                              fontFamily: "Avenir Black")),
                     ),
                   ),
                   Center(
                     child: Padding(
-                      padding: EdgeInsets.only(top: double.parse(config.clinicDateTop)),
+                      padding: EdgeInsets.only(
+                          top: double.parse(config.clinicDateTop)),
                       child: Text(stringClinicDateTime,
                           style: TextStyle(
                               fontSize: double.parse(config.clinicDateFontSize),
-                              fontFamily: "Avenir Black"
-                          )
-                      ),
+                              fontFamily: "Avenir Black")),
                     ),
                   ),
                 ],
@@ -210,10 +216,8 @@ class _HomePageState extends State<HomePage> {
               ],
             );
           }
-          return const CircularProgressIndicator();
         },
       ),
     );
   }
-
 }

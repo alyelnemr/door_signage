@@ -27,8 +27,8 @@ class Doctor {
   });
 
   String id;
-  final String doctorNameAR;
-  final String doctorNameEN;
+  String doctorNameAR;
+  String doctorNameEN;
   int roomID;
   String clinicNameAR;
   String clinicNameEN;
@@ -42,20 +42,20 @@ class Doctor {
   bool isActive;
 
   factory Doctor.fromJson(Map<String, dynamic> json) => Doctor(
-    id: json["ID"],
-    doctorNameAR: json["DoctorNameAR"],
-    doctorNameEN: json["DoctorNameEN"],
+    id: json["ID"] ?? "",
+    doctorNameAR: json["DoctorNameAR"] ?? "",
+    doctorNameEN: json["DoctorNameEN"] ?? "",
     roomID: json["RoomID"],
-    clinicNameAR: json["ClinicNameAR"],
-    clinicNameEN: json["ClinicNameEN"],
-    specialtyAR: json["SpecialtyAR"],
-    specialtyEN: json["SpecialtyEN"],
-    clinicStartDate: json["ClinicStartDate"],
-    clinicEndDate: json["ClinicEndDate"],
-    imagePath: json["ImagePath"],
-    refreshImage: json["RefreshImage"],
-    displayTime: json["DisplayTime"],
-    isActive: json["IsActive"],
+    clinicNameAR: json["ClinicNameAR"] ?? "",
+    clinicNameEN: json["ClinicNameEN"] ?? "",
+    specialtyAR: json["SpecialtyAR"] ?? "",
+    specialtyEN: json["SpecialtyEN"] ?? "",
+    clinicStartDate: json["ClinicStartDate"] ?? "",
+    clinicEndDate: json["ClinicEndDate"] ?? "",
+    imagePath: json["ImagePath"] ?? "",
+    refreshImage: json["RefreshImage"] == null ? false : json["RefreshImage"] == "0" ? false : json["RefreshImage"] == 0 ? false : true ,
+    displayTime: json["DisplayTime"] == null ? false : json["DisplayTime"] == "0" ? false : json["DisplayTime"] == 0 ? false : true ,
+    isActive: json["IsActive"] == null ? false : json["IsActive"] == "0" ? false : json["IsActive"] == 0 ? false : true ,
   );
 
   Map<String, dynamic> toJson() => {

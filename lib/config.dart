@@ -17,6 +17,9 @@ class Config {
     required this.doctorNameARFontSize,
     required this.specialtyENTop,
     required this.specialtyENFontSize,
+    required this.specialtyENFontColorRed,
+    required this.specialtyENFontColorGreen,
+    required this.specialtyENFontColorBlue,
     required this.specialtyARTop,
     required this.specialtyARFontSize,
     required this.clinicDateTop,
@@ -30,6 +33,9 @@ class Config {
   String doctorNameARFontSize;
   String specialtyENTop;
   String specialtyENFontSize;
+  String specialtyENFontColorRed;
+  String specialtyENFontColorGreen;
+  String specialtyENFontColorBlue;
   String specialtyARTop;
   String specialtyARFontSize;
   String clinicDateTop;
@@ -43,6 +49,9 @@ class Config {
     doctorNameARFontSize: json["doctorNameARFontSize"],
     specialtyENTop: json["specialtyENTop"],
     specialtyENFontSize: json["specialtyENFontSize"],
+    specialtyENFontColorRed: json["specialtyENFontColorRed"],
+    specialtyENFontColorGreen: json["specialtyENFontColorGreen"],
+    specialtyENFontColorBlue: json["specialtyENFontColorBlue"],
     specialtyARTop: json["specialtyARTop"],
     specialtyARFontSize: json["specialtyARFontSize"],
     clinicDateTop: json["clinicDateTop"],
@@ -57,6 +66,9 @@ class Config {
     "doctorNameARFontSize": doctorNameARFontSize,
     "specialtyENTop": specialtyENTop,
     "specialtyENFontSize": specialtyENFontSize,
+    "specialtyENFontColorRed": specialtyENFontColorRed,
+    "specialtyENFontColorGreen": specialtyENFontColorGreen,
+    "specialtyENFontColorBlue": specialtyENFontColorBlue,
     "specialtyARTop": specialtyARTop,
     "specialtyARFontSize": specialtyARFontSize,
     "clinicDateTop": clinicDateTop,

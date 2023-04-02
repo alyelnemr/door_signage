@@ -110,7 +110,6 @@ class _HomePageState extends State<HomePage> {
       config1 = Config.fromJson(jsonDecode(response1.body));
       completer.complete(config1);
     }
-
     return completer.future;
   }
 

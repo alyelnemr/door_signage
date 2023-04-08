@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:door_signage/queue.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -35,6 +36,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<Doctor> doctorFuture; // = getDataFromAPI();
+  late Future<QueueData> queueDataFuture;
+  QueueData queueData = QueueData(queueText: "");
   Doctor doctor = Doctor(
       id: "0",
       doctorNameAR: "",
@@ -53,7 +56,7 @@ class _HomePageState extends State<HomePage> {
   var secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
   var mainURL = "";
   DateTime? firstPressedTime;
-  int durationSeconds = 60;
+  int durationSeconds = 10;
   bool isTimeDisplay = true;
   bool isImageDisplay = true;
   Config config = Config(
@@ -75,26 +78,42 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    getConfigurationFromAPI().then((value) {
+      setState(() {
+        config = value;
+      });
+    });
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     setState(() {
       secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
+      queueDataFuture = Future.value(queueData);
       doctorFuture = Future.value(doctor);
-      Timer.periodic(Duration(seconds: int.parse(config.duration)), (timer) {
+    });
+    Timer.periodic(Duration(seconds: int.parse(config.duration)), (timer) {
+      setState(() {
+        secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
+      });
+      getDataFromAPI().then((value) {
         setState(() {
-          secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
-          getDataFromAPI().then((value) {
-            if (value.doctorNameEN != doctor.doctorNameEN) {
-              doctor = value;
-              doctorFuture = Future.value(value);
-            }
-          }).catchError((err) {
-            print(err);
-          });
-          getConfigurationFromAPI().then((value) {
-            config = value;
-          });
+          if (value.doctorNameEN != doctor.doctorNameEN) {
+            doctor = value;
+            doctorFuture = Future.value(value);
+          }
+          if (value.specialtyEN != "" && value.specialtyEN != queueData.queueText) {
+            queueDataFuture =
+                Future.value(QueueData(queueText: value.specialtyEN));
+          }
+        });
+      }).catchError((err) {
+        print(err);
+      });
+    });
+    Timer.periodic(const Duration(hours: 1), (timer) {
+      getConfigurationFromAPI().then((value) {
+        setState(() {
+          config = value;
         });
       });
     });
@@ -110,12 +129,13 @@ class _HomePageState extends State<HomePage> {
       config1 = Config.fromJson(jsonDecode(response1.body));
       completer.complete(config1);
     }
+
     return completer.future;
   }
 
   Future<Doctor> getDataFromAPI() async {
     String url =
-        "http://ahj-queue.andalusiagroup.net:1020/api/getClinicByIPAddress/device";
+        "http://ahj-queue.andalusiagroup.net:1020/api/getClinicByIPAddress/dede";
     final response2 = await http.get(Uri.parse(url));
     if (response2.statusCode == 200) {
       if (response2.body != "") {
@@ -154,6 +174,40 @@ class _HomePageState extends State<HomePage> {
       return DateFormat('hh:mm a').format(currentDate);
     }
     return "";
+  }
+
+  Widget drawWidgetForQueue() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.only(top: double.parse(config.specialtyENTop)),
+        child: FutureBuilder<QueueData>(
+          future: queueDataFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return Text(snapshot.data!.queueText,
+                  style: TextStyle(
+                      color: Color.fromARGB(
+                          255,
+                          int.parse(config.specialtyENFontColorRed),
+                          int.parse(config.specialtyENFontColorGreen),
+                          int.parse(config.specialtyENFontColorBlue)),
+                      fontSize: double.parse(config.specialtyENFontSize),
+                      fontFamily: "Avenir Black"));
+            } else {
+              return Text("حالة رقم: ",
+                  style: TextStyle(
+                      color: Color.fromARGB(
+                          255,
+                          int.parse(config.specialtyENFontColorRed),
+                          int.parse(config.specialtyENFontColorGreen),
+                          int.parse(config.specialtyENFontColorBlue)),
+                      fontSize: double.parse(config.specialtyENFontSize),
+                      fontFamily: "Avenir Black"));
+            }
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -223,22 +277,7 @@ class _HomePageState extends State<HomePage> {
                                 fontFamily: "Avenir Black")),
                       ),
                     ),
-                    Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            top: double.parse(config.specialtyENTop)),
-                        child: Text(specialtyEN,
-                            style: TextStyle(
-                                color: Color.fromARGB(
-                                    255,
-                                    int.parse(config.specialtyENFontColorRed),
-                                    int.parse(config.specialtyENFontColorGreen),
-                                    int.parse(config.specialtyENFontColorBlue)),
-                                fontSize:
-                                    double.parse(config.specialtyENFontSize),
-                                fontFamily: "Avenir Black")),
-                      ),
-                    ),
+                    drawWidgetForQueue(),
                     Center(
                       child: Padding(
                         padding: EdgeInsets.only(

@@ -101,10 +101,8 @@ class _HomePageState extends State<HomePage> {
             doctor = value;
             doctorFuture = Future.value(value);
           }
-          if (value.specialtyEN != "" && value.specialtyEN != queueData.queueText) {
-            queueDataFuture =
-                Future.value(QueueData(queueText: value.specialtyEN));
-          }
+          queueDataFuture =
+              Future.value(QueueData(queueText: value.specialtyEN));
         });
       }).catchError((err) {
         print(err);
@@ -194,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                       fontSize: double.parse(config.specialtyENFontSize),
                       fontFamily: "Avenir Black"));
             } else {
-              return Text("حالة رقم: ",
+              return Text(snapshot.data!.queueText,
                   style: TextStyle(
                       color: Color.fromARGB(
                           255,

@@ -24,6 +24,7 @@ class Doctor {
     required this.refreshImage,
     required this.displayTime,
     required this.isActive,
+    required this.isIPD,
   });
 
   String id;
@@ -40,6 +41,7 @@ class Doctor {
   bool refreshImage;
   bool displayTime;
   bool isActive;
+  bool isIPD;
 
   factory Doctor.fromJson(Map<String, dynamic> json) => Doctor(
     id: json["ID"] ?? "",
@@ -56,6 +58,7 @@ class Doctor {
     refreshImage: json["RefreshImage"] == null ? false : json["RefreshImage"] == "0" ? false : json["RefreshImage"] == 0 ? false : true ,
     displayTime: json["DisplayTime"] == null ? false : json["DisplayTime"] == "0" ? false : json["DisplayTime"] == 0 ? false : true ,
     isActive: json["IsActive"] == null ? false : json["IsActive"] == "0" ? false : json["IsActive"] == 0 ? false : true ,
+    isIPD: json["isIPD"] == null ? false : json["isIPD"] == "0" ? false : json["isIPD"] == 0 ? false : true ,
   );
 
   Map<String, dynamic> toJson() => {
@@ -73,5 +76,6 @@ class Doctor {
     "RefreshImage": refreshImage,
     "DisplayTime": displayTime,
     "IsActive": isActive,
+    "isIPD": isIPD,
   };
 }

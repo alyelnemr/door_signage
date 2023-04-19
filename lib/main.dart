@@ -52,22 +52,7 @@ class _HomePageState extends State<HomePage> {
   String upgradeURL = "http://ahj-queue.andalusiagroup.net:1020/api/getUpdate/";
   QueueData queueData = QueueData(queueText: "");
   late TextEditingController passwordController;
-  Doctor doctor = Doctor(
-      id: "0",
-      doctorNameAR: "",
-      doctorNameEN: "",
-      roomID: 0,
-      clinicNameAR: "",
-      clinicNameEN: "",
-      specialtyAR: "",
-      specialtyEN: "",
-      clinicStartDate: "2023-01-01 00:00:00",
-      clinicEndDate: "2023-01-01 00:00:00",
-      imagePath: "http://ahj-queue.andalusiagroup.net:1020/api/getEmptyImage",
-      refreshImage: false,
-      displayTime: false,
-      isActive: false,
-      isIPD: false);
+  Doctor doctor = Doctor();
   var secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
   var mainURL = "";
   DateTime? firstPressedTime;
@@ -75,25 +60,7 @@ class _HomePageState extends State<HomePage> {
   bool isTimeDisplay = true;
   bool isImageDisplay = true;
   bool isIPD = false;
-  Config config = Config(
-      duration: "10",
-      durationIPD: "3600",
-      appPassword: "1234",
-      doctorNameENTop: "170",
-      doctorNameENTopIPD: "70",
-      doctorNameENFontSize: "70",
-      doctorNameARTop: "10",
-      doctorNameARFontSize: "70",
-      specialtyENTop: "50",
-      specialtyENFontSize: "70",
-      specialtyENFontColorRed: "255",
-      specialtyENFontColorGreen: "153",
-      specialtyENFontColorBlue: "0",
-      specialtyARTop: "10",
-      specialtyARTopIPD: "50",
-      specialtyARFontSize: "70",
-      clinicDateTop: "60",
-      clinicDateFontSize: "70");
+  Config config = Config();
 
   @override
   void initState() {
@@ -151,8 +118,10 @@ class _HomePageState extends State<HomePage> {
       });
       getDataFromAPI().then((value) {
         setState(() {
-          doctor = value;
-          doctorFuture = Future.value(value);
+          if (value.doctorNameEN != doctor.doctorNameEN) {
+            doctor = value;
+            doctorFuture = Future.value(value);
+          }
           if (isIPD != doctor.isIPD) {
             isIPD = doctor.isIPD;
             MyPreferences.setDeviceTypeIsIPD(isIPD);
@@ -188,23 +157,7 @@ class _HomePageState extends State<HomePage> {
         return completer.future;
       } else {
         var completer = Completer<Doctor>();
-        Doctor doc = Doctor(
-            id: "0",
-            doctorNameAR: "",
-            doctorNameEN: "",
-            roomID: 0,
-            clinicNameAR: "",
-            clinicNameEN: "",
-            specialtyAR: "",
-            specialtyEN: "",
-            clinicStartDate: "2023-01-01 00:00:00",
-            clinicEndDate: "2023-01-01 00:00:00",
-            imagePath:
-                "http://ahj-queue.andalusiagroup.net:1020/api/getEmptyImage",
-            refreshImage: false,
-            displayTime: false,
-            isActive: false,
-            isIPD: false);
+        Doctor doc = Doctor();
         if (isIPD) {
           doc.imagePath =
               "http://ahj-queue.andalusiagroup.net:1020/api/getEmptyImageIPD";
@@ -562,7 +515,11 @@ class _HomePageState extends State<HomePage> {
                                   fontFamily: "Avenir Black")),
                         ),
                       ),
-                      isIPD ? const Text("") : drawWidgetForQueue(),
+                      isIPD
+                          ? const Divider(
+                              height: 1,
+                            )
+                          : drawWidgetForQueue(),
                       Center(
                         child: Padding(
                           padding: EdgeInsets.only(
@@ -593,29 +550,130 @@ class _HomePageState extends State<HomePage> {
                           ? Center(
                               child: Padding(
                                 padding: EdgeInsets.only(
-                                    top: double.parse(config.clinicDateTop)),
+                                    top:
+                                        double.parse(config.clinicDateTop) - 40,
+                                    left: 230),
                                 child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Container(
-                                          decoration: BoxDecoration(
+                                          width: 190,
+                                          height: 80,
+                                        ),
+                                        const VerticalDivider(width: 7),
+                                        Container(
+                                          width: 190,
+                                          height: 80,
+                                          decoration: const BoxDecoration(
                                             image: DecorationImage(
-                                                image: NetworkImage(mainURL),
-                                                fit: BoxFit.cover),
+                                                image: NetworkImage(
+                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/2"),
+                                                fit: BoxFit.fill),
+                                          ),
+                                        ),
+                                        const VerticalDivider(width: 7),
+                                        Container(
+                                          width: 190,
+                                          height: 80,
+                                          decoration: const BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/3"),
+                                                fit: BoxFit.fill),
+                                          ),
+                                        ),
+                                        const VerticalDivider(width: 7),
+                                        Container(
+                                          width: 120,
+                                          height: 80,
+                                          decoration: const BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/4"),
+                                                fit: BoxFit.fill),
+                                          ),
+                                        ),
+                                        const VerticalDivider(width: 1),
+                                        Container(
+                                          width: 120,
+                                          height: 80,
+                                          decoration: const BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/5"),
+                                                fit: BoxFit.fill),
                                           ),
                                         ),
                                       ],
                                     ),
-                                    Row()
+                                    const Divider(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 250,
+                                          height: 160,
+                                          decoration: const BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/6"),
+                                                fit: BoxFit.fill),
+                                          ),
+                                        ),
+                                        const VerticalDivider(width: 7),
+                                        Container(
+                                          width: 270,
+                                          height: 160,
+                                          decoration: const BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/7"),
+                                                fit: BoxFit.fill),
+                                          ),
+                                        ),
+                                        const VerticalDivider(width: 7),
+                                        Container(
+                                          width: 280,
+                                          height: 160,
+                                          decoration: const BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/8"),
+                                                fit: BoxFit.fill),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          alignment: Alignment.center,
+                                          child: const Text(
+                                            "v2.0",
+                                            style: TextStyle(
+                                              fontSize: 30,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
                                   ],
                                 ),
                               ),
                             )
-                          : const Text(""),
+                          : const VerticalDivider(
+                              width: 1,
+                            ),
                     ],
                   ),
                 );

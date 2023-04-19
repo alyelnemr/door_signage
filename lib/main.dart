@@ -58,9 +58,11 @@ class _HomePageState extends State<HomePage> {
   DateTime? firstPressedTime;
   int durationSeconds = 10;
   bool isTimeDisplay = true;
-  bool isImageDisplay = true;
+  bool isImageDisplay = false;
+  bool isAlreadyImageRefreshed = false;
   bool isIPD = false;
   Config config = Config();
+  late Timer timerData;
 
   @override
   void initState() {
@@ -101,7 +103,7 @@ class _HomePageState extends State<HomePage> {
       });
     });
 
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     setState(() {
@@ -109,7 +111,7 @@ class _HomePageState extends State<HomePage> {
       queueDataFuture = Future.value(queueData);
       doctorFuture = Future.value(doctor);
     });
-    Timer.periodic(
+    timerData = Timer.periodic(
         Duration(
             seconds: int.parse(isIPD ? config.durationIPD : config.duration)),
         (timer) {
@@ -118,7 +120,7 @@ class _HomePageState extends State<HomePage> {
       });
       getDataFromAPI().then((value) {
         setState(() {
-          if (value.doctorNameEN != doctor.doctorNameEN) {
+          if (value.doctorNameEN != doctor.doctorNameEN || doctor.isIPD) {
             doctor = value;
             doctorFuture = Future.value(value);
           }
@@ -215,11 +217,11 @@ class _HomePageState extends State<HomePage> {
                 getDataFromAPI().then((value) {
                   setState(() {
                     doctor = value;
+                    doctor.refreshImage = true;
+                    isAlreadyImageRefreshed = false;
+                    isIPD = doctor.isIPD;
+                    MyPreferences.setDeviceTypeIsIPD(isIPD);
                     doctorFuture = Future.value(value);
-                    if (isIPD != doctor.isIPD) {
-                      isIPD = doctor.isIPD;
-                      MyPreferences.setDeviceTypeIsIPD(isIPD);
-                    }
                   });
                 });
               },
@@ -468,9 +470,19 @@ class _HomePageState extends State<HomePage> {
                     snapshot.data!.isActive ? snapshot.data!.specialtyAR : "";
                 isImageDisplay = snapshot.data!.refreshImage;
                 isTimeDisplay = snapshot.data!.displayTime;
+                bool isIPDImage1 = snapshot.data!.isIPDImage1;
+                bool isIPDImage2 = snapshot.data!.isIPDImage2;
+                bool isIPDImage3 = snapshot.data!.isIPDImage3;
+                bool isIPDImage4 = snapshot.data!.isIPDImage4;
+                bool isIPDImage5 = snapshot.data!.isIPDImage5;
+                bool isIPDImage6 = snapshot.data!.isIPDImage6;
+                bool isIPDImage7 = snapshot.data!.isIPDImage7;
+                bool isIPDImage8 = snapshot.data!.isIPDImage8;
                 mainURL = snapshot.data!.imagePath;
-                if (isImageDisplay) {
+                if (isImageDisplay && isAlreadyImageRefreshed == false) {
                   mainURL = "${snapshot.data!.imagePath}?dum=$secondDateTime";
+                  isImageDisplay = false;
+                  isAlreadyImageRefreshed = true;
                 }
                 DateTime startDate =
                     DateTime.parse(snapshot.data!.clinicStartDate);
@@ -518,6 +530,7 @@ class _HomePageState extends State<HomePage> {
                       isIPD
                           ? const Divider(
                               height: 1,
+                              color: Colors.white,
                             )
                           : drawWidgetForQueue(),
                       Center(
@@ -534,7 +547,10 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       isIPD
-                          ? const Text("")
+                          ? const Divider(
+                              height: 1,
+                              color: Colors.white,
+                            )
                           : Center(
                               child: Padding(
                                 padding: EdgeInsets.only(
@@ -551,7 +567,7 @@ class _HomePageState extends State<HomePage> {
                               child: Padding(
                                 padding: EdgeInsets.only(
                                     top:
-                                        double.parse(config.clinicDateTop) - 40,
+                                        double.parse(config.clinicDateTop) - 60,
                                     left: 230),
                                 child: Column(
                                   children: [
@@ -560,96 +576,161 @@ class _HomePageState extends State<HomePage> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                        Container(
-                                          width: 190,
-                                          height: 80,
+                                        isIPDImage1
+                                            ? Container(
+                                                width: 190,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/1"),
+                                                      fit: BoxFit.fill),
+                                                ),
+                                              )
+                                            : const Divider(
+                                                height: 1,
+                                                color: Colors.white,
+                                              ),
+                                        const VerticalDivider(
+                                          width: 7,
+                                          color: Colors.white,
                                         ),
-                                        const VerticalDivider(width: 7),
-                                        Container(
-                                          width: 190,
-                                          height: 80,
-                                          decoration: const BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/2"),
-                                                fit: BoxFit.fill),
-                                          ),
+                                        isIPDImage2
+                                            ? Container(
+                                                width: 190,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/2"),
+                                                      fit: BoxFit.fill),
+                                                ),
+                                              )
+                                            : const Divider(
+                                                height: 1,
+                                                color: Colors.white,
+                                              ),
+                                        const VerticalDivider(
+                                          width: 7,
+                                          color: Colors.white,
                                         ),
-                                        const VerticalDivider(width: 7),
-                                        Container(
-                                          width: 190,
-                                          height: 80,
-                                          decoration: const BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/3"),
-                                                fit: BoxFit.fill),
-                                          ),
+                                        isIPDImage3
+                                            ? Container(
+                                                width: 190,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/3"),
+                                                      fit: BoxFit.fill),
+                                                ),
+                                              )
+                                            : const Divider(
+                                                height: 1,
+                                                color: Colors.white,
+                                              ),
+                                        const VerticalDivider(
+                                          width: 7,
+                                          color: Colors.white,
                                         ),
-                                        const VerticalDivider(width: 7),
-                                        Container(
-                                          width: 120,
-                                          height: 80,
-                                          decoration: const BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/4"),
-                                                fit: BoxFit.fill),
-                                          ),
+                                        isIPDImage4
+                                            ? Container(
+                                                width: 120,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/4"),
+                                                      fit: BoxFit.fill),
+                                                ),
+                                              )
+                                            : const Divider(
+                                                height: 1,
+                                                color: Colors.white,
+                                              ),
+                                        const VerticalDivider(
+                                          width: 1,
+                                          color: Colors.white,
                                         ),
-                                        const VerticalDivider(width: 1),
-                                        Container(
-                                          width: 120,
-                                          height: 80,
-                                          decoration: const BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/5"),
-                                                fit: BoxFit.fill),
-                                          ),
-                                        ),
+                                        isIPDImage5
+                                            ? Container(
+                                                width: 120,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/5"),
+                                                      fit: BoxFit.fill),
+                                                ),
+                                              )
+                                            : const Divider(
+                                                height: 1,
+                                                color: Colors.white,
+                                              ),
                                       ],
                                     ),
                                     const Divider(
-                                      height: 10,
+                                      height: 1,
+                                      color: Colors.white,
                                     ),
                                     Row(
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                        Container(
-                                          width: 250,
-                                          height: 160,
-                                          decoration: const BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/6"),
-                                                fit: BoxFit.fill),
-                                          ),
+                                        isIPDImage6
+                                            ? Container(
+                                                width: 250,
+                                                height: 160,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/6"),
+                                                      fit: BoxFit.fill),
+                                                ),
+                                              )
+                                            : const Divider(
+                                                height: 1,
+                                                color: Colors.white,
+                                              ),
+                                        const VerticalDivider(
+                                          width: 7,
+                                          color: Colors.white,
                                         ),
-                                        const VerticalDivider(width: 7),
-                                        Container(
-                                          width: 270,
-                                          height: 160,
-                                          decoration: const BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/7"),
-                                                fit: BoxFit.fill),
-                                          ),
+                                        isIPDImage7
+                                            ? Container(
+                                                width: 270,
+                                                height: 160,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/7"),
+                                                      fit: BoxFit.fill),
+                                                ),
+                                              )
+                                            : const Divider(
+                                                height: 1,
+                                                color: Colors.white,
+                                              ),
+                                        const VerticalDivider(
+                                          width: 7,
+                                          color: Colors.white,
                                         ),
-                                        const VerticalDivider(width: 7),
-                                        Container(
-                                          width: 280,
-                                          height: 160,
-                                          decoration: const BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                    "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/8"),
-                                                fit: BoxFit.fill),
-                                          ),
-                                        ),
+                                        isIPDImage8
+                                            ? Container(
+                                                width: 280,
+                                                height: 160,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/8"),
+                                                      fit: BoxFit.fill),
+                                                ),
+                                              )
+                                            : const Divider(
+                                                height: 1,
+                                                color: Colors.white,
+                                              ),
                                       ],
                                     ),
                                     Row(
@@ -673,6 +754,7 @@ class _HomePageState extends State<HomePage> {
                             )
                           : const VerticalDivider(
                               width: 1,
+                              color: Colors.white,
                             ),
                     ],
                   ),

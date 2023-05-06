@@ -96,8 +96,8 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         doctor = value;
         doctorFuture = Future.value(value);
-        if (isIPD != doctor.isIPD) {
-          isIPD = doctor.isIPD;
+        if (isIPD != value.isIPD) {
+          isIPD = value.isIPD;
           MyPreferences.setDeviceTypeIsIPD(isIPD);
         }
       });
@@ -120,11 +120,13 @@ class _HomePageState extends State<HomePage> {
       });
       getDataFromAPI().then((value) {
         setState(() {
-          if (value.doctorNameEN != doctor.doctorNameEN || doctor.isIPD) {
+          if (value.isEqual(doctor)) {
+            var x = 1;
+          } else {
             doctor = value;
             doctorFuture = Future.value(value);
           }
-          if (isIPD != doctor.isIPD) {
+          if (isIPD != value.isIPD) {
             isIPD = doctor.isIPD;
             MyPreferences.setDeviceTypeIsIPD(isIPD);
           }
@@ -182,6 +184,10 @@ class _HomePageState extends State<HomePage> {
     if (response1.statusCode == 200) {
       config1 = Config.fromJson(jsonDecode(response1.body));
       completer.complete(config1);
+      if (config1.duration != config.duration ||
+          config1.durationIPD != config.durationIPD) {
+        changeTimerConfiguration();
+      }
     }
 
     return completer.future;
@@ -197,6 +203,78 @@ class _HomePageState extends State<HomePage> {
       completer.complete(ip);
     }
     return completer.future;
+  }
+
+  SimpleDialogOption notUsedToggleButtons() {
+    return SimpleDialogOption(
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "Device Type",
+            style: TextStyle(fontSize: 20),
+          ),
+          StatefulBuilder(builder: (context, setState) {
+            return Container(
+              color: Colors.amber.shade50,
+              child: ToggleButtons(
+                onPressed: (int newIndex) {
+                  Navigator.of(context).pop();
+                  getDataFromAPI().then((value) {
+                    setState(() {
+                      for (int i = 0; i < listDeviceType.length; i++) {
+                        if (i == newIndex) {
+                          listDeviceType[i] = true;
+                        } else {
+                          listDeviceType[i] = false;
+                        }
+                      }
+                      if (listDeviceType[0] == true) {
+                        MyPreferences.setDeviceTypeIsIPD(false);
+                        isIPD = false;
+                      } else {
+                        MyPreferences.setDeviceTypeIsIPD(true);
+                        isIPD = true;
+                      }
+                      doctor = value;
+                      doctor.refreshImage = true;
+                      isAlreadyImageRefreshed = false;
+                      isIPD = doctor.isIPD;
+                      doctorFuture = Future.value(value);
+                    });
+                  });
+                },
+                isSelected: listDeviceType,
+                color: Colors.amber,
+                selectedColor: Colors.white,
+                fillColor: Colors.amber.shade700,
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                    ),
+                    child: Text(
+                      "OPD",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                    ),
+                    child: Text(
+                      "IPD",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
   }
 
   Future<void> onPressedGoodPassword() async {
@@ -227,67 +305,6 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             SimpleDialogOption(
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Device Type",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  StatefulBuilder(builder: (context, setState) {
-                    return Container(
-                      color: Colors.amber.shade50,
-                      child: ToggleButtons(
-                        onPressed: (int newIndex) {
-                          setState(() {
-                            for (int i = 0; i < listDeviceType.length; i++) {
-                              if (i == newIndex) {
-                                listDeviceType[i] = true;
-                              } else {
-                                listDeviceType[i] = false;
-                              }
-                            }
-                            if (listDeviceType[0] == true) {
-                              MyPreferences.setDeviceTypeIsIPD(false);
-                              isIPD = false;
-                            } else {
-                              MyPreferences.setDeviceTypeIsIPD(true);
-                              isIPD = true;
-                            }
-                          });
-                        },
-                        isSelected: listDeviceType,
-                        color: Colors.amber,
-                        selectedColor: Colors.white,
-                        fillColor: Colors.amber.shade700,
-                        children: const [
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
-                            child: Text(
-                              "OPD",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
-                            child: Text(
-                              "IPD",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
-            SimpleDialogOption(
               child: const Text(
                 "Show IP Address",
                 style: TextStyle(fontSize: 20),
@@ -306,6 +323,52 @@ class _HomePageState extends State<HomePage> {
                             style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           )),
+                        ],
+                      );
+                    });
+              },
+            ),
+            SimpleDialogOption(
+              child: const Text(
+                "Show Config Data",
+                style: TextStyle(fontSize: 20),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return SimpleDialog(
+                        title: const Text("Configuration"),
+                        children: [
+                          Center(
+                            child: Text(
+                              "Duration: ${config.duration}",
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Center(
+                            child: Text(
+                              "durationIPD: ${config.durationIPD}",
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Center(
+                            child: Text(
+                              "doctorNameENTop: ${config.doctorNameENTop}",
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Center(
+                            child: Text(
+                              "doctorNameENTopIPD: ${config.doctorNameENTopIPD}",
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ],
                       );
                     });
@@ -503,6 +566,39 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: ListView(
                     children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: TextButton(
+                          style: const ButtonStyle(
+                              foregroundColor:
+                                  MaterialStatePropertyAll(Colors.black)),
+                          onLongPress: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return SimpleDialog(
+                                    title: const Text("IP Address"),
+                                    children: [
+                                      Center(
+                                          child: Text(
+                                        ipAddress,
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      )),
+                                    ],
+                                  );
+                                });
+                          },
+                          onPressed: () {},
+                          child: const Text(
+                            "v2.1",
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ),
                       Center(
                         child: Padding(
                           padding: EdgeInsets.only(
@@ -529,6 +625,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       isIPD
                           ? const Divider(
+                              indent: 50,
+                              endIndent: 50,
                               height: 1,
                               color: Colors.white,
                             )
@@ -548,6 +646,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       isIPD
                           ? const Divider(
+                              indent: 50,
+                              endIndent: 50,
                               height: 1,
                               color: Colors.white,
                             )
@@ -576,7 +676,7 @@ class _HomePageState extends State<HomePage> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                        isIPDImage1
+                                        snapshot.data!.isIPDImage1
                                             ? Container(
                                                 width: 190,
                                                 height: 80,
@@ -587,15 +687,23 @@ class _HomePageState extends State<HomePage> {
                                                       fit: BoxFit.fill),
                                                 ),
                                               )
-                                            : const Divider(
-                                                height: 1,
-                                                color: Colors.white,
+                                            : Container(
+                                                width: 190,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/1off"),
+                                                      fit: BoxFit.fill),
+                                                ),
                                               ),
                                         const VerticalDivider(
+                                          indent: 50,
+                                          endIndent: 50,
                                           width: 7,
                                           color: Colors.white,
                                         ),
-                                        isIPDImage2
+                                        snapshot.data!.isIPDImage2
                                             ? Container(
                                                 width: 190,
                                                 height: 80,
@@ -606,15 +714,23 @@ class _HomePageState extends State<HomePage> {
                                                       fit: BoxFit.fill),
                                                 ),
                                               )
-                                            : const Divider(
-                                                height: 1,
-                                                color: Colors.white,
+                                            : Container(
+                                                width: 190,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/2off"),
+                                                      fit: BoxFit.fill),
+                                                ),
                                               ),
                                         const VerticalDivider(
+                                          indent: 50,
+                                          endIndent: 50,
                                           width: 7,
                                           color: Colors.white,
                                         ),
-                                        isIPDImage3
+                                        snapshot.data!.isIPDImage3
                                             ? Container(
                                                 width: 190,
                                                 height: 80,
@@ -625,15 +741,23 @@ class _HomePageState extends State<HomePage> {
                                                       fit: BoxFit.fill),
                                                 ),
                                               )
-                                            : const Divider(
-                                                height: 1,
-                                                color: Colors.white,
+                                            : Container(
+                                                width: 190,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/3off"),
+                                                      fit: BoxFit.fill),
+                                                ),
                                               ),
                                         const VerticalDivider(
+                                          indent: 50,
+                                          endIndent: 50,
                                           width: 7,
                                           color: Colors.white,
                                         ),
-                                        isIPDImage4
+                                        snapshot.data!.isIPDImage4
                                             ? Container(
                                                 width: 120,
                                                 height: 80,
@@ -644,15 +768,23 @@ class _HomePageState extends State<HomePage> {
                                                       fit: BoxFit.fill),
                                                 ),
                                               )
-                                            : const Divider(
-                                                height: 1,
-                                                color: Colors.white,
+                                            : Container(
+                                                width: 120,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/4off"),
+                                                      fit: BoxFit.fill),
+                                                ),
                                               ),
                                         const VerticalDivider(
+                                          indent: 50,
+                                          endIndent: 50,
                                           width: 1,
                                           color: Colors.white,
                                         ),
-                                        isIPDImage5
+                                        snapshot.data!.isIPDImage5
                                             ? Container(
                                                 width: 120,
                                                 height: 80,
@@ -663,13 +795,21 @@ class _HomePageState extends State<HomePage> {
                                                       fit: BoxFit.fill),
                                                 ),
                                               )
-                                            : const Divider(
-                                                height: 1,
-                                                color: Colors.white,
-                                              ),
+                                            : Container(
+                                                width: 120,
+                                                height: 80,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/5off"),
+                                                      fit: BoxFit.fill),
+                                                ),
+                                              )
                                       ],
                                     ),
                                     const Divider(
+                                      indent: 50,
+                                      endIndent: 50,
                                       height: 1,
                                       color: Colors.white,
                                     ),
@@ -678,7 +818,7 @@ class _HomePageState extends State<HomePage> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                        isIPDImage6
+                                        snapshot.data!.isIPDImage6
                                             ? Container(
                                                 width: 250,
                                                 height: 160,
@@ -689,15 +829,23 @@ class _HomePageState extends State<HomePage> {
                                                       fit: BoxFit.fill),
                                                 ),
                                               )
-                                            : const Divider(
-                                                height: 1,
-                                                color: Colors.white,
+                                            : Container(
+                                                width: 250,
+                                                height: 160,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/6off"),
+                                                      fit: BoxFit.fill),
+                                                ),
                                               ),
                                         const VerticalDivider(
+                                          indent: 50,
+                                          endIndent: 50,
                                           width: 7,
                                           color: Colors.white,
                                         ),
-                                        isIPDImage7
+                                        snapshot.data!.isIPDImage7
                                             ? Container(
                                                 width: 270,
                                                 height: 160,
@@ -708,15 +856,23 @@ class _HomePageState extends State<HomePage> {
                                                       fit: BoxFit.fill),
                                                 ),
                                               )
-                                            : const Divider(
-                                                height: 1,
-                                                color: Colors.white,
+                                            : Container(
+                                                width: 270,
+                                                height: 160,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/7off"),
+                                                      fit: BoxFit.fill),
+                                                ),
                                               ),
                                         const VerticalDivider(
+                                          indent: 50,
+                                          endIndent: 50,
                                           width: 7,
                                           color: Colors.white,
                                         ),
-                                        isIPDImage8
+                                        snapshot.data!.isIPDImage8
                                             ? Container(
                                                 width: 280,
                                                 height: 160,
@@ -727,35 +883,46 @@ class _HomePageState extends State<HomePage> {
                                                       fit: BoxFit.fill),
                                                 ),
                                               )
-                                            : const Divider(
-                                                height: 1,
-                                                color: Colors.white,
+                                            : Container(
+                                                width: 280,
+                                                height: 160,
+                                                decoration: const BoxDecoration(
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          "http://ahj-queue.andalusiagroup.net:1020/api/getIPDImageByID/8off"),
+                                                      fit: BoxFit.fill),
+                                                ),
                                               ),
                                       ],
                                     ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          alignment: Alignment.center,
-                                          child: const Text(
-                                            "v2.0",
-                                            style: TextStyle(
-                                              fontSize: 30,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )
                                   ],
                                 ),
                               ),
                             )
-                          : const VerticalDivider(
-                              width: 1,
+                          : const Divider(
+                              indent: 50,
+                              endIndent: 50,
+                              height: 1,
                               color: Colors.white,
                             ),
+                      isIPD
+                          ? Center(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                    top: double.parse(config.specialtyARTop)),
+                                child: Text(doctor.patientID,
+                                    style: TextStyle(
+                                        fontSize: double.parse(
+                                            config.clinicDateFontSize)-5,
+                                        fontFamily: "Avenir Black")),
+                              ),
+                            )
+                          : const Divider(
+                              indent: 50,
+                              endIndent: 50,
+                              height: 1,
+                              color: Colors.white,
+                            )
                     ],
                   ),
                 );
@@ -886,5 +1053,36 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       return null;
     }
+  }
+
+  void changeTimerConfiguration() {
+    timerData.cancel();
+    timerData = Timer.periodic(
+        Duration(
+            seconds: int.parse(isIPD ? config.durationIPD : config.duration)),
+        (timer) {
+      setState(() {
+        secondDateTime = DateTime.now().millisecondsSinceEpoch.toString();
+      });
+      getDataFromAPI().then((value) {
+        setState(() {
+          if (value.doctorNameEN != doctor.doctorNameEN || doctor.isIPD) {
+            doctor = value;
+            doctorFuture = Future.value(value);
+          }
+          if (isIPD != doctor.isIPD) {
+            isIPD = doctor.isIPD;
+            MyPreferences.setDeviceTypeIsIPD(isIPD);
+          }
+
+          if (isIPD == false) {
+            queueDataFuture =
+                Future.value(QueueData(queueText: value.specialtyEN));
+          }
+        });
+      }).catchError((err) {
+        print(err);
+      });
+    });
   }
 }

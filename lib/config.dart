@@ -10,8 +10,8 @@ String configToJson(Config data) => json.encode(data.toJson());
 
 class Config {
   Config({
-    this.duration= "10",
-    this.durationIPD= "3600",
+    this.duration= "5",
+    this.durationIPD= "5",
     this.appPassword= "1234",
     this.doctorNameENTop= "170",
     this.doctorNameENTopIPD= "70",

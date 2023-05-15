@@ -384,6 +384,15 @@ class _HomePageState extends State<HomePage> {
                 openAndDownloadFile();
               },
             ),
+            SimpleDialogOption(
+              child: const Text(
+                "Exit App",
+                style: TextStyle(fontSize: 20),
+              ),
+              onPressed: () {
+                SystemNavigator.pop();
+              },
+            ),
           ],
         );
       },
@@ -592,7 +601,7 @@ class _HomePageState extends State<HomePage> {
                           },
                           onPressed: () {},
                           child: const Text(
-                            "v2.1",
+                            "v2.5",
                             style: TextStyle(
                               fontSize: 15,
                             ),
@@ -909,11 +918,11 @@ class _HomePageState extends State<HomePage> {
                           ? Center(
                               child: Padding(
                                 padding: EdgeInsets.only(
-                                    top: double.parse(config.specialtyARTop)),
+                                    top: double.parse(config.fileNumberTop)),
                                 child: Text(doctor.patientID,
                                     style: TextStyle(
                                         fontSize: double.parse(
-                                            config.clinicDateFontSize)-5,
+                                            config.fileNumberFontSize),
                                         fontFamily: "Avenir Black")),
                               ),
                             )
@@ -1024,7 +1033,6 @@ class _HomePageState extends State<HomePage> {
   Future openAndDownloadFile() async {
     final file = await downloadFile();
     if (file == null) return;
-    print('Path: ${file.path}');
     OpenFile.open(file.path);
   }
 
@@ -1033,7 +1041,6 @@ class _HomePageState extends State<HomePage> {
       final appStorage = await getApplicationDocumentsDirectory();
       String fileName =
           "door_signage${DateFormat('yy-mm-dd').format(DateTime.now())}.apk";
-      print("app storage path ..${appStorage.path}.....");
       final file = File('${appStorage.path}/$fileName');
       final response = await Dio().get(
         upgradeURL,
@@ -1045,7 +1052,6 @@ class _HomePageState extends State<HomePage> {
       );
 
       final raf = file.openSync(mode: FileMode.write);
-      print("writing on file.....");
       raf.writeFromSync(response.data);
       await raf.close();
 

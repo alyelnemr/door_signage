@@ -26,8 +26,10 @@ class Config {
     this.specialtyARTop= "10",
     this.specialtyARTopIPD= "50",
     this.specialtyARFontSize= "70",
-    this.clinicDateTop= "60",
-    this.clinicDateFontSize= "70",
+    this.clinicDateTop= "80",
+    this.clinicDateFontSize= "40",
+    this.fileNumberTop = "60",
+    this.fileNumberFontSize = "70",
   });
 
   String duration;
@@ -48,6 +50,8 @@ class Config {
   String specialtyARFontSize;
   String clinicDateTop;
   String clinicDateFontSize;
+  String fileNumberTop;
+  String fileNumberFontSize;
 
   static Config fromJson(json) => Config(
     duration: json["duration"],
@@ -68,6 +72,8 @@ class Config {
     specialtyARFontSize: json["specialtyARFontSize"],
     clinicDateTop: json["clinicDateTop"],
     clinicDateFontSize: json["clinicDateFontSize"],
+    fileNumberTop: json["fileNumberTop"],
+    fileNumberFontSize: json["fileNumberFontSize"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -89,5 +95,7 @@ class Config {
     "specialtyARFontSize": specialtyARFontSize,
     "clinicDateTop": clinicDateTop,
     "clinicDateFontSize": clinicDateFontSize,
+    "fileNumberTop": fileNumberTop,
+    "fileNumberFontSize": fileNumberFontSize,
   };
 }
